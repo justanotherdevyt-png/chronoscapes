@@ -90,11 +90,7 @@
         async function loadDailyPuzzle() {
             const todayISO = new Date().toISOString().split('T')[0];
             
-            let { data, error } = await supabase
-                .from('daily_puzzles')
-                .select('*')
-                .eq('release_date', todayISO)
-                .single();
+            let { data, error } = await supabaseClient.from('daily_puzzles').select('*').eq('release_date', todayISO).single();
 
             if (error || !data) {
                 // Fallback backup puzzle mechanism just in case

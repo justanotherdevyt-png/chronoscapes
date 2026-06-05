@@ -4,42 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChronosCapes - Daily History Map Game</title>
-    <!-- We load the official, free Supabase client library directly via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-color: #121214; --card-color: #1a1a1e; --accent-color: #e5c07b;
-            --text-color: #ffffff; --text-muted: #9ca3af; --success-color: #4caf50;
+            --bg-color: #0f172a;
+            --card-color: #1e293b;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --success-color: #10b981;
+            --border-color: #334155;
         }
-        body { margin: 0; font-family: system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--card-color); width: 100%; max-width: 600px; padding-bottom: 10px; }
-        h1 { margin: 0; color: var(--accent-color); font-size: 28px; letter-spacing: 2px; }
-        .subtitle { color: var(--text-muted); font-size: 14px; margin: 5px 0 0 0; }
-        main { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
-        #clue-box { background-color: var(--card-color); border-left: 4px solid var(--accent-color); padding: 15px; border-radius: 4px; font-size: 16px; line-height: 1.5; }
-        #map-container { width: 100%; height: 350px; background-color: #000; border-radius: 8px; overflow: hidden; border: 1px solid #2d2d34; }
+        body { 
+            margin: 0; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header { 
+            text-align: center; 
+            margin-bottom: 24px; 
+            border-bottom: 1px solid var(--border-color); 
+            width: 100%; 
+            max-width: 650px; 
+            padding-bottom: 16px; 
+        }
+        h1 { margin: 0; color: #fff; font-size: 32px; font-weight: 800; letter-spacing: 3px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .subtitle { color: var(--text-muted); font-size: 14px; margin: 6px 0 0 0; font-weight: 500; }
+        main { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
+        #clue-box { 
+            background: linear-gradient(135deg, var(--card-color), #0f172a); 
+            border-left: 4px solid var(--accent-color); 
+            padding: 18px; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            line-height: 1.6;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        #map-container { 
+            width: 100%; 
+            height: 380px; 
+            background-color: #020617; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
         iframe { width: 100%; height: 100%; border: none; }
-        .game-controls { display: flex; flex-direction: column; gap: 10px; }
-        .guess-row { background-color: var(--card-color); padding: 12px; border-radius: 6px; border: 1px solid #2d2d34; font-weight: bold; }
-        .input-group { display: flex; gap: 10px; margin-top: 10px; }
-        input { flex: 1; padding: 12px; border-radius: 6px; border: 1px solid #2d2d34; background-color: var(--card-color); color: #fff; font-size: 16px; }
-        button { padding: 12px 24px; border-radius: 6px; border: none; background-color: var(--accent-color); color: #000; font-weight: bold; font-size: 16px; cursor: pointer; }
-        #result-box { display: none; background-color: var(--card-color); padding: 20px; border-radius: 8px; border: 1px solid var(--success-color); text-align: center; }
-        footer { margin-top: 40px; font-size: 12px; color: var(--text-muted); text-align: center; }
-        footer a { color: var(--accent-color); text-decoration: none; margin: 0 10px; }
+        .game-controls { display: flex; flex-direction: column; gap: 12px; }
+        .guess-row { 
+            background-color: var(--card-color); 
+            padding: 14px 18px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color); 
+            font-weight: 600; 
+            font-size: 15px;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+        .input-group { display: flex; gap: 12px; margin-top: 8px; }
+        input { 
+            flex: 1; 
+            padding: 14px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color); 
+            background-color: #0f172a; 
+            color: #fff; 
+            font-size: 16px; 
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus { border-color: var(--accent-color); }
+        button { 
+            padding: 14px 28px; 
+            border-radius: 8px; 
+            border: none; 
+            background-color: var(--accent-color); 
+            color: #0f172a; 
+            font-weight: 700; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: background-color 0.2s; 
+        }
+        button:hover { background-color: var(--accent-hover); }
+        #result-box { 
+            display: none; 
+            background-color: var(--card-color); 
+            padding: 24px; 
+            border-radius: 12px; 
+            border: 1px solid var(--success-color); 
+            text-align: center; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        .btn-share {
+            background-color: var(--success-color);
+            color: white;
+            margin-top: 12px;
+        }
+        .btn-share:hover { background-color: #059669; }
+        footer { margin: 40px 0 20px 0; font-size: 13px; color: var(--text-muted); text-align: center; }
+        footer a { color: var(--accent-color); text-decoration: none; margin: 0 12px; }
+        footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>CHRONOSCAPES</h1>
-        <p class="subtitle">Where in history are you standing right now?</p>
+        <p class="subtitle">Decipher the modern landscape. Find the historical anchor point.</p>
     </header>
 
     <main>
         <div id="clue-box">
-            <strong>Today's Historical Clue:</strong><br>
-            <span id="clue-text">Synchronizing map temporal shifts...</span>
+            <strong style="color: var(--accent-color);">Temporal Dispatch:</strong><br>
+            <span id="clue-text">Synchronizing map anchor points...</span>
         </div>
 
         <div id="map-container">
@@ -48,7 +133,7 @@
 
         <div class="game-controls">
             <div id="guesses-container">
-                <div class="guess-row" id="r1">1. Waiting for temporal scan...</div>
+                <div class="guess-row" id="r1">1. Awaiting coordinate evaluation...</div>
                 <div class="guess-row" id="r2">2.</div>
                 <div class="guess-row" id="r3">3.</div>
                 <div class="guess-row" id="r4">4.</div>
@@ -56,57 +141,46 @@
             </div>
 
             <div class="input-group" id="action-inputs">
-                <input type="text" id="user-guess" placeholder="Enter City or Country..." autocomplete="off">
-                <button onclick="submitGuess()">GUESS</button>
+                <input type="text" id="user-guess" placeholder="Enter City, Country or Landmark name..." autocomplete="off">
+                <button onclick="submitGuess()">EVALUATE</button>
             </div>
         </div>
 
         <div id="result-box">
-            <h2 style="color: var(--success-color); margin-top:0;">Victory! You Found the Timeline!</h2>
-            <p id="share-emojis" style="letter-spacing: 3px; font-size: 20px;"></p>
-            <button onclick="copyScores()">Copy Score</button>
-            <hr style="border-color: #2d2d34; margin: 20px 0;">
-            <h3>The Historical Context</h3>
-            <p id="history-educational-text" style="text-align: left; line-height: 1.6; color: var(--text-muted);"></p>
+            <h2 id="result-title" style="color: var(--success-color); margin-top:0; font-size: 24px;">Timeline Anchored Successfully!</h2>
+            <p id="share-emojis" style="letter-spacing: 6px; font-size: 24px; margin: 16px 0;"></p>
+            <button class="btn-share" onclick="copyScores()">Copy Log Data to Clipboard</button>
+            <hr style="border-color: var(--border-color); margin: 24px 0;">
+            <h3 style="color: var(--accent-color);">Historical Archive Summary</h3>
+            <p id="history-educational-text" style="text-align: left; line-height: 1.7; color: #cbd5e1; font-size: 15px;"></p>
         </div>
     </main>
 
     <footer>
-        <p>© 2026 ChronosCapes | <a href="#">About Us</a> | <a href="#">Privacy Policy</a> | <a href="#">Contact Support</a></p>
+        <p>© 2026 ChronosCapes | <a href="/about.html">About Us</a> | <a href="/privacy.html">Privacy Policy</a> | <a href="/contact.html">Contact Us</a></p>
     </footer>
 
     <script>
-        // CONFIGURATION: Connects your web files to your Supabase engine
-        // IMPORTANT: Replace these strings with your actual project keys found in Supabase Settings -> API
-        const SUPABASE_URL = "https://rragwfegqdqnahzttpfg.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyYWd3ZmVncWRxbmFoenR0cGZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDcxNjIsImV4cCI6MjA5NjE4MzE2Mn0.Jn14oC25fpCWjFbh5ISqQF3FEt9NhWyIqsGVvkueMLU";
+        // Insert your custom Supabase Keys gathered in Part 2 here:
+        const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL_HERE";
+        const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE";
         
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let activePuzzle = null; let currentGuessCount = 1; const maxGuesses = 5;
 
-        let activePuzzle = null;
-        let currentGuessCount = 1;
-        const maxGuesses = 5;
-
-        // Fetch puzzle matching the current date automatically
         async function loadDailyPuzzle() {
             const todayISO = new Date().toISOString().split('T')[0];
-            
-            let { data, error } = await supabase
-                .from('daily_puzzles')
-                .select('*')
-                .eq('release_date', todayISO)
-                .single();
+            let { data, error } = await supabase.from('daily_puzzles').select('*').eq('release_date', todayISO).single();
 
             if (error || !data) {
-                // Fallback backup puzzle mechanism just in case
                 document.getElementById('clue-text').innerText = "Chronological reading error. Testing backup time loop.";
                 return;
             }
-
             activePuzzle = data;
             document.getElementById('clue-text').innerText = activePuzzle.clue_text;
             document.getElementById('street-view-frame').src = activePuzzle.embed_url;
-            document.getElementById('r1').innerText = "1. Enter a location to record your first guess...";
+            document.getElementById('r1').innerText = "1. Enter location to scan coordinates...";
+            document.getElementById('r1').style.color = "var(--text-color)";
         }
 
         function submitGuess() {
@@ -116,17 +190,21 @@
             if (!userGuessValue) return;
 
             const currentRow = document.getElementById(`r${currentGuessCount}`);
+            currentRow.style.color = "var(--text-color)";
 
             if (userGuessValue === activePuzzle.correct_answer.toLowerCase()) {
-                currentRow.innerText = `${currentGuessCount}. ${inputField.value} — 🟩 CORRECT!`;
+                currentRow.innerText = `${currentGuessCount}. ${inputField.value} — 🟩 ANCHORED`;
+                currentRow.style.borderColor = "var(--success-color)";
                 endGame(true);
             } else {
-                currentRow.innerText = `${currentGuessCount}. ${inputField.value} — 🟥 INCORRECT`;
+                currentRow.innerText = `${currentGuessCount}. ${inputField.value} — 🟥 MISALIGNED`;
                 currentGuessCount++;
                 if (currentGuessCount > maxGuesses) {
                     endGame(false);
                 } else {
-                    document.getElementById(`r${currentGuessCount}`).innerText = `${currentGuessCount}. Waiting for guess...`;
+                    const nextRow = document.getElementById(`r${currentGuessCount}`);
+                    nextRow.innerText = `${currentGuessCount}. Awaiting coordinate evaluation...`;
+                    nextRow.style.color = "var(--text-color)";
                 }
             }
             inputField.value = "";
@@ -147,8 +225,9 @@
             document.getElementById('share-emojis').innerText = emojiString;
             document.getElementById('history-educational-text').innerText = activePuzzle.history_lesson;
             if(!isWin) {
-                resultBox.querySelector('h2').innerText = "Timeline Lost! Correct answer: " + activePuzzle.correct_answer.toUpperCase();
-                resultBox.querySelector('h2').style.color = "#f44336";
+                document.getElementById('result-title').innerText = "Timeline Fractured! Out of Guesses.";
+                document.getElementById('result-title').style.color = "#ef4444";
+                resultBox.style.borderColor = "#ef4444";
             }
             resultBox.scrollIntoView({ behavior: 'smooth' });
         }
@@ -156,12 +235,10 @@
         function copyScores() {
             const emojis = document.getElementById('share-emojis').innerText;
             const scoreDisplay = currentGuessCount > maxGuesses ? 'X' : currentGuessCount;
-            const textToCopy = `ChronosCapes Day ${activePuzzle.day_number}\nScore: ${scoreDisplay}/${maxGuesses}\n${emojis}\nPlay free here!`;
+            const textToCopy = `ChronosCapes Day ${activePuzzle.day_number}\nLog Verification: ${scoreDisplay}/${maxGuesses}\n${emojis}\nPlay free here: ${window.location.href}`;
             navigator.clipboard.writeText(textToCopy);
-            alert("Score copied!");
+            alert("Score copied to clipboard!");
         }
-
-        // Run on mount
         loadDailyPuzzle();
     </script>
 </body>
